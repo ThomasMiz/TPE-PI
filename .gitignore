@@ -1,0 +1,9 @@
+
+# Do not include CSV files
+*.csv
+
+# Do not include compiled executables
+*.o
+*.obj
+*.out
+*.exe
