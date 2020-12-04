@@ -17,7 +17,6 @@ typedef struct csvReaderCDT *csvReaderADT;
 
 /* Create a new csvReaderADT and initialize it to read the provided file. 
 ** If the file could not be opened, it does not create a reader and returns NULL. */
-
 csvReaderADT newCsvReader(const char *file);
 
 /* All resources used by the reader are . */
@@ -27,9 +26,10 @@ void freeCsvReader(csvReaderADT);
 int csvEndOfFile(csvReaderADT);
 
 /* To use in the first line, the header.
-** Save the column of interest's numbers in the structure from the vector colums, previously ordered. If there are not so many columns, it will return CSV_MAX_COLUMNS_ERROR.
-** Returns the number of columns found, or if there was an error it will return CSV_ALREADY_INITIALIZED or CSV_NO_MEMORY. */
-int csvReadHeader(csvReaderADT, int columns[], size_t dim);
+** Save the column of interest's numbers in the structure from the vector colums.
+** If there are not enough columns, it will return CSV_MAX_COLUMNS_ERROR.
+** Returns the number of columns in the header, or if there was an error it will return CSV_ALREADY_INITIALIZED or CSV_NO_MEMORY. */
+int csvSetupHeader(csvReaderADT, int columns[], size_t dim);
 
 /* Read the next token and return a string with the content and leave its length in strLen.
 ** The returned pointer MUST NOT BE SAVED, it points to an internal buffer and it will be modified

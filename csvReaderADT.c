@@ -5,10 +5,11 @@
 #include "csvReaderADT.h"
 
 // The maximum capacity allowed for a buffer. Any token longer than this amount of chars will be trimmed to this amount.
-// This will be the length of the string, Including '\ 0.
+// This will be the length of the string, Including '\0'.
 #define MAX_BUFF_CAPACITY 129
 
-struct csvReaderCDT{
+struct csvReaderCDT
+{
     // The file that is of interest to the reader.
     FILE *file;
 
@@ -53,7 +54,8 @@ csvReaderADT newCsvReader(const char *file)
     return r;
 }
 
-void freeCsvReader(csvReaderADT reader){
+void freeCsvReader(csvReaderADT reader)
+{
     // The file is closed.
     fclose(reader->file);
     reader->file = NULL;
@@ -66,11 +68,31 @@ void freeCsvReader(csvReaderADT reader){
     free(reader);
 }
 
-int csvEndOfFile(csvReaderADT reader){
+// Read a token from the file, the reader advances one column
+// but the content is not saved in the internal buffer of the csvReader.
+// Returns 1 if there are more columns to read on the current line.
+static int skipColumn(FILE *file)
+{
+    // The file is read until the end of the token/line/file is reached.
+    char c;
+    do
+    {
+        c = fgetc(file);
+    } while (c != EOF && c != '\n' && c != ';');
+
+    // If the char we read is a '\n', we ungetc-it, so that no line is advanced until csvNextLine() is called.
+    if (c == '\n')
+        ungetc('\n', file);
+
+    return c != '\n' && c != EOF;
+}
+
+int csvEndOfFile(csvReaderADT reader)
+{
     return feof(reader->file);
 }
 
-// Returns 1 if the file reader is at the end of a line (this includes EOF). 
+// Returns 1 if the file reader is at the end of a line (this includes EOF).
 // The position of the reader does not advance.
 static int isEndOfLine(FILE *file)
 {
@@ -83,9 +105,25 @@ static int isEndOfLine(FILE *file)
     return ret;
 }
 
+// Sorts an array of integers in-place.
+static void sortArray(int *array, size_t length)
+{
+    for (int i = 0; i < length; i++)
+    {
+        int minIndex = i;
+        for (int c = i + 1; c < length; c++)
+            if (array[c] < array[minIndex])
+                minIndex = c;
+
+        int tmp = array[i];
+        array[i] = array[minIndex];
+        array[minIndex] = tmp;
+    }
+}
+
 // Read a token from the file, advancing the reader and saving the content
 // in the internal buffer of the csvReader.
-// In this way we save the fgets plus strtok call, 
+// In this way we save the fgets plus strtok call.
 static void readTokenToBuff(csvReaderADT reader)
 {
     FILE *file = reader->file;
@@ -110,7 +148,7 @@ static void readTokenToBuff(csvReaderADT reader)
         ungetc('\n', file);
 }
 
-int csvReadHeader(csvReaderADT reader, int columns[], size_t dim)
+int csvSetupHeader(csvReaderADT reader, int columns[], size_t dim)
 {
     // Defensive programming in case the header is read more than once.
     if (reader->requiredColumns != NULL)
@@ -121,7 +159,7 @@ int csvReadHeader(csvReaderADT reader, int columns[], size_t dim)
         return CSV_NO_MEMORY;
 
     FILE *file = reader->file;
-    
+
     size_t numberOfColums = 0;
 
     // The header is read.
@@ -132,42 +170,24 @@ int csvReadHeader(csvReaderADT reader, int columns[], size_t dim)
     }
 
     // If a column that does not exist is needed, returns error.
-    if(numberOfColums < columns[dim])
+    if (numberOfColums < columns[dim - 1])
         return CSV_MAX_COLUMNS_ERROR;
 
-    size_t count = 0;
-
     //The column of interest's numbers are saved in the structure.
-    while(count<dim)
-        reader->requiredColumns[reader->columnsCount++] = columns[count++];
+    for (reader->columnsCount = 0; reader->columnsCount < dim; reader->columnsCount++)
+        reader->requiredColumns[reader->columnsCount] = columns[reader->columnsCount];
 
-    return count;
-}
+    // The requiredColumns array needs to be sorted, so let's sorted.
+    sortArray(reader->requiredColumns, reader->columnsCount);
 
-// Read a token from the file, the reader advances one column 
-// but the content is not saved in the internal buffer of the csvReader.
-// Returns 1 if there are more columns to read on the current line.
-static int skipColumn(FILE *file)
-{
-    // The file is read until the end of the token/line/file is reached.
-    char c;
-    do
-    {
-        c = fgetc(file);
-    } while (c != EOF && c != '\n' && c != ';');
-
-    // If the char we read is a '\n', we ungetc-it, so that no line is advanced until csvNextLine () is called.
-    if (c == '\n')
-        ungetc('\n', file);
-
-    return c != '\n' && c != EOF;
+    return numberOfColums;
 }
 
 const char *csvNextToken(csvReaderADT reader, size_t *strLen, int *numCol)
 {
     *strLen = 0;
     *numCol = -1;
-    
+
     //If there are no more columns of interest on the line.
     if (reader->requiredColumnIndex == reader->columnsCount)
         return NULL;
@@ -175,7 +195,7 @@ const char *csvNextToken(csvReaderADT reader, size_t *strLen, int *numCol)
     FILE *file = reader->file;
 
     int nextColumn = reader->requiredColumns[reader->requiredColumnIndex++];
-    
+
     // As long as the reader is not positioned in a column of interest, columns are skipped without saving anything in memory.
     while (reader->currentColumn < nextColumn)
     {
@@ -204,8 +224,8 @@ int csvNextLine(csvReaderADT reader)
     // If a new line is found we make sure it is not an empty line.
     if (c == '\n')
     {
-        // We read a char. If it is the end of the line, it is because the file ends with an empty line. 
-        // We then assume that we have reached the end of the file. 
+        // We read a char. If it is the end of the line, it is because the file ends with an empty line.
+        // We then assume that we have reached the end of the file.
         // If not, we return the char we removed so that it can be read again.
         c = fgetc(file);
         if (c != EOF)
@@ -213,7 +233,7 @@ int csvNextLine(csvReaderADT reader)
     }
 
     // Variables that track columns are reset.
-    reader->currentColumn = 0;
+    reader->currentColumn = 1;
     reader->requiredColumnIndex = 0;
     return c != EOF;
 }
