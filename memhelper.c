@@ -1,4 +1,5 @@
 #include "memhelper.h"
+#include <stdlib.h>
 #include <ctype.h>
 
 int tryMalloc(void **ptr, size_t size)
