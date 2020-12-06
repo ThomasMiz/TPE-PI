@@ -22,8 +22,8 @@ void freeSpecieCounter(specieCounterADT);
 ** Returns the error code of the operation. */
 enum SPECIE_ERR specieAddOne(specieCounterADT, const char *specieName, size_t nameLen);
 
-/* Finds the most popular specie and returns a string with it's name. (the string should
-** not be freed by the user of the ADT). Returns NULL if no species have been registered yet. */
-const char *specieMostPopular(specieCounterADT);
+/* Finds the most popular specie and returns a new string with it's name. 
+** Returns NULL if no species have been registered yet. */
+char *specieMostPopular(specieCounterADT);
 
 #endif

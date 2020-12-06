@@ -10,9 +10,11 @@
 
 static FILE *file;
 
-static int printZone(TZone * zone)
+static int printZone(TZone *zone)
 {
-    fprintf(file,"%s;%s\n",zone->name, specieMostPopular(zone->species));
+    char *name = specieMostPopular(zone->species);
+    fprintf(file, "%s;%s\n", zone->name, name);
+    free(name);
 
     return 1;
 }
@@ -23,7 +25,7 @@ enum QUERY2_ERR saveQuery2()
 
     if (file == NULL)
         return QUERY2_CANNOT_OPEN_FILE;
-    
+
     fprintf(file, COL_NAME_ZONE ";" COL_NAME_SPECIE_NAME "\n");
     zonesForEach(printZone);
 
