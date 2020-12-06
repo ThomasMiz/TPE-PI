@@ -129,6 +129,8 @@ enum ZONES_ERR initializeZones(const char *file)
     }
 
     TZone zone;
+    zone.species = NULL;
+    zone.treeCount = 0;
 
     // We read zones data.
     while (csvNextLine(reader))

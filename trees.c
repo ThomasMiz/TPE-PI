@@ -66,7 +66,8 @@ static int setupSpecies(TZone *zone)
 // Static functions to free the speciesCounterADT in each zone.
 static int unwrapSpecies(TZone *zone)
 {
-    freeSpecieCounter(zone->species);
+    if (zone->species != NULL)
+        freeSpecieCounter(zone->species);
     return 1;
 }
 
