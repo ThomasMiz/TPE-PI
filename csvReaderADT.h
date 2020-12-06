@@ -12,6 +12,10 @@
 
 typedef struct csvReaderCDT *csvReaderADT;
 
+// The maximum capacity allowed for a buffer. Any token longer than this amount of chars will be trimmed to this amount.
+// This will be the length of the string, Including '\0'.
+#define MAX_BUFF_CAPACITY 129
+
 #define CSV_ALREADY_INITIALIZED -1
 #define CSV_NO_MEMORY -2
 #define CSV_MAX_COLUMNS_ERROR -3

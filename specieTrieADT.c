@@ -3,9 +3,6 @@
 #include "specieTrieADT.h"
 #include "memhelper.h"
 
-// Un-comment this if you want to enable speciePrintAll().
-// #include <stdio.h>
-
 /* The amount of letters in the english alphabet. */
 #define LETTER_COUNT ('z' - 'a' + 1)
 
@@ -100,11 +97,11 @@ static TNode *addNode(TNode *prev, int charIndex)
     return newNode;
 }
 
-enum TRIE_ERR specieAddOne(specieTrieADT trie, const char *specieName)
+enum SPECIE_ERR specieAddOne(specieTrieADT trie, const char *specieName)
 {
     // We first check that we received a non-null-or-empty string.
     if (specieName == NULL || specieName[0] == '\0')
-        return TRIE_BAD_NAME;
+        return SPECIE_BAD_NAME;
 
     // We initialize the prev and current variables as the root node and NULL respectively.
     TNode *prev = &(trie->trie);
@@ -120,7 +117,7 @@ enum TRIE_ERR specieAddOne(specieTrieADT trie, const char *specieName)
 
         // If the node 'current' doesnt exist, we create it. If that fails, we return TRIE_NO_MEMORY.
         if (current == NULL && (current = addNode(prev, currentCharIndex)) == NULL)
-            return TRIE_NO_MEMORY;
+            return SPECIE_NO_MEMORY;
 
         specieName++;
         prev = current;
@@ -130,7 +127,7 @@ enum TRIE_ERR specieAddOne(specieTrieADT trie, const char *specieName)
     // At this point, we're ensured current is not NULL, because since the string
     // isn't null nor empty, we must have entered the while loop at least once.
     current->count++;
-    return TRIE_OK;
+    return SPECIE_OK;
 }
 
 /* Recursively goes through all the nodes and subnodes, comparing and leaving
@@ -179,40 +176,6 @@ char *specieMostPopular(specieTrieADT trie)
     // Since the trie doesn't keep track of casing, we uppercase the first character.
     str[0] = toupper(str[0]);
 
-    // We can also uppercase all characters after a ' '.
-    /*for (int i = 1; i < mostDepth; i++)
-        if (str[i - 1] == ' ')
-            str[i] = toupper(str[i]);*/
-
     str[mostDepth] = '\0';
     return str;
 }
-
-/*static void printRecursive(TNode *node, char *buff, size_t *buffCount)
-{
-    if (node == NULL)
-        return;
-
-    if (node->count != 0)
-    {
-        buff[*buffCount] = 0;
-        printf("Especie: %d x \"%s\"\n", node->count, buff);
-    }
-
-    for (int i = 0; i < NODE_COUNT; i++)
-    {
-        buff[(*buffCount)++] = (i == LETTER_COUNT - 1) ? ' ' : 'a' + i;
-        printRecursive(node->nextNodes[i], buff, buffCount);
-        (*buffCount)--;
-    }
-}
-
-void speciePrintAll(specieTrieADT trie)
-{
-    char buff[129];
-    size_t buffCount = 0;
-
-    printf("Printing trie:\n");
-    printRecursive(&(trie->trie), buff, &buffCount);
-    printf("End printing trie.\n");
-}*/

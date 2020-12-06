@@ -122,9 +122,9 @@ enum ZONES_ERR initializeZones(const char *file)
     if (headerResult < 0)
     {
         freeCsvReader(reader);
-        if(headerResult == CSV_NO_MEMORY)
+        if (headerResult == CSV_NO_MEMORY)
             return ZONES_NO_MEMORY;
-        
+
         return ZONES_MISSING_COLUMN;
     }
 
@@ -189,19 +189,22 @@ void zonesForEach(int (*func)(TZone *))
     }
 }
 
-TZone ** getAllZones(size_t * dim){
+TZone **getAllZones(size_t *dim)
+{
 
-    if(zones == NULL)
+    if (zones == NULL)
         return NULL;
 
-    TZone ** arrayZone;
-    if(!tryMalloc((void**)&arrayZone, sizeof(TZone*)*zoneCount)){
+    TZone **arrayZone;
+    if (!tryMalloc((void **)&arrayZone, sizeof(TZone *) * zoneCount))
+    {
         return NULL;
     }
 
     TList current = zones;
     int i = 0;
-    while(current != NULL){
+    while (current != NULL)
+    {
         *arrayZone[i++] = current->zone;
         current = current->next;
     }

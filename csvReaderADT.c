@@ -4,10 +4,6 @@
 #include "memhelper.h"
 #include "csvReaderADT.h"
 
-// The maximum capacity allowed for a buffer. Any token longer than this amount of chars will be trimmed to this amount.
-// This will be the length of the string, Including '\0'.
-#define MAX_BUFF_CAPACITY 129
-
 struct csvReaderCDT
 {
     // The file that is of interest to the reader.

@@ -1,15 +1,17 @@
 #ifndef zones_h
 #define zones_h
-#include <stdlib.h>
+#include "specieTrieADT.h"
 
-// When the population of a zone isn't present, this value will be asigned.
+/* When the population of a zone isn't present, this value will be asigned. */
 #define NUMBER_NOT_PRESENT -1
 
-// Represents a zone. For example, a neighborhood.
+/* Represents a zone. For example, a neighborhood. */
 typedef struct
 {
     const char *name;
     unsigned int population;
+    size_t treeCount;
+    specieTrieADT species;
 } TZone;
 
 enum ZONES_ERR
@@ -22,21 +24,22 @@ enum ZONES_ERR
     ZONES_REPEATED
 };
 
-/* Loads all the zones into memory, by reading them from a CSV file. */
+/* Loads all the zones into memory if no error has encountered,
+** by reading them from a CSV file. */
 enum ZONES_ERR initializeZones(const char *file);
 
 /* Frees all the resources used by zones. This includes the name strings
-** all zones have.*/
+** all zones have. */
 void freeZones();
 
 /* Looks for a zone by name and returns that zone. If no zone is found, returns NULL. */
 TZone *getZoneByName(const char *name);
 
 /* Executes the provided function for each loaded zone, in alphabetical order.
-** if returns 1 continues and if not, it cuts the execution */
-void zonesForEach(int (*func)(TZone*));
+** If returns 1 continues and if not, it cuts the execution. */
+void zonesForEach(int (*func)(TZone *));
 
-/*returns an array with all zones and NULL if there are no zones or if it ran out of memory*/
-TZone ** getAllZones(size_t *dim);
+/* Returns an array with all zones and NULL if there are no zones or if it ran out of memory. */
+TZone **getAllZones(size_t *dim);
 
 #endif
