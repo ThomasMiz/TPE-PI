@@ -96,6 +96,7 @@ enum TREES_ERR processTrees(const char *file)
         // the trees that follow, is a contract matter.
         if (treeResult != TREES_OK)
         {
+            zonesForEach(unwrapSpecies);
             freeCsvReader(reader);
             free(buffSpecie);
             return treeResult;
