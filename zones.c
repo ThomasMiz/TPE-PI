@@ -5,11 +5,6 @@
 #include "memhelper.h"
 #include "zones.h"
 
-// The identifier in the csv header for the column that contains a zone's name.
-#define COL_ZONENAME 1
-// The identifier in the csv header for the column that contains a zone's population.
-#define COL_POPULATION 2
-
 typedef struct node
 {
     TZone zone;
@@ -83,7 +78,7 @@ static enum ZONES_ERR readZone(TZone *zone, csvReaderADT reader, int keyCount)
         // In case new columns are added they would be added as new cases.
         switch (tokenCol)
         {
-        case COL_ZONENAME:
+        case ZONE_ZONENAME:
             if (len != 0)
             {
                 char *name;
@@ -95,7 +90,7 @@ static enum ZONES_ERR readZone(TZone *zone, csvReaderADT reader, int keyCount)
             }
             break;
 
-        case COL_POPULATION:
+        case ZONE_POPULATION:
             zone->population = (tokenStr == NULL || len == 0) ? NUMBER_NOT_PRESENT : atoi(tokenStr);
             break;
 
@@ -119,7 +114,7 @@ enum ZONES_ERR initializeZones(const char *file)
         return ZONES_NO_FILE;
 
     // Columns of interest in the file, if more needed they would be added to the vector.
-    int columns[] = {COL_ZONENAME, COL_POPULATION};
+    int columns[] = {ZONE_ZONENAME, ZONE_POPULATION};
     int keyCount = sizeof(columns) / sizeof(columns[0]);
     enum CSV_ERR headerResult = csvSetupHeader(reader, columns, keyCount);
 

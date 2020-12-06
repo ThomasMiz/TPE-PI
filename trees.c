@@ -6,9 +6,6 @@
 #include "zones.h"
 #include "trees.h"
 
-#define COL_ZONENAME 3
-#define COL_SPECIENAME 8
-
 static enum TREES_ERR readTree(csvReaderADT reader, int keyCount, char *buffSpecie)
 {
     const char *tokenStr;
@@ -21,16 +18,16 @@ static enum TREES_ERR readTree(csvReaderADT reader, int keyCount, char *buffSpec
     for (int i = 0; i < keyCount; i++)
     {
         tokenStr = csvNextToken(reader, &len, &tokenCol);
-        
+
         // In case new columns are added they would be added as new cases.
         switch (tokenCol)
         {
-        case COL_ZONENAME:
+        case TREE_ZONENAME:
             if (len != 0)
                 zone = getZoneByName(tokenStr);
             break;
 
-        case COL_SPECIENAME:
+        case TREE_SPECIESNAME:
             // If at any time a file interprets unknown species as an empty string remains buffSpecie[0]='\0'.
             // We only need to save the name of the species because
             // we don't know if it appears before the name of the zone.
@@ -65,11 +62,15 @@ static int setupSpecies(TZone *zone)
 }
 
 // Static functions to free the speciesCounterADT in each zone.
-
 static int unwrapSpecies(TZone *zone)
 {
     freeSpecieCounter(zone->species);
     return 1;
+}
+
+void freeTrees()
+{
+    zonesForEach(unwrapSpecies);
 }
 
 enum TREES_ERR processTrees(const char *file)
@@ -80,7 +81,7 @@ enum TREES_ERR processTrees(const char *file)
         return TREES_NO_FILE;
 
     // Columns of interest in the file, if more needed they would be added to the vector.
-    int columns[] = {COL_ZONENAME, COL_SPECIENAME};
+    int columns[] = {TREE_ZONENAME, TREE_SPECIESNAME};
     int keyCount = sizeof(columns) / sizeof(columns[0]);
     enum CSV_ERR headerResult = csvSetupHeader(reader, columns, keyCount);
 
@@ -111,14 +112,12 @@ enum TREES_ERR processTrees(const char *file)
         // the trees that follow, is a contract matter.
         if (treeResult != TREES_OK)
         {
-            zonesForEach(unwrapSpecies);
             freeCsvReader(reader);
             free(buffSpecie);
             return treeResult;
         }
     }
 
-    zonesForEach(unwrapSpecies);
     freeCsvReader(reader);
     free(buffSpecie);
     return TREES_OK;

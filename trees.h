@@ -15,4 +15,7 @@ enum TREES_ERR
 ** by reading them from a CSV file. */
 enum TREES_ERR processTrees(const char *file);
 
+/* Frees all the resources used by processTrees. */
+void freeTrees();
+
 #endif
