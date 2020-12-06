@@ -1,6 +1,7 @@
 #include "csvReaderADT.h"
 #include "memhelper.h"
 #include "zones.h"
+#include <stdlib.h>
 #include <string.h>
 #include <strings.h>
 
@@ -131,19 +132,19 @@ enum ZONES_ERR initializeZones(const char *file)
     TZone zone;
     while (csvNextLine(reader))
     {
-        enum ZONES_ERR result = readZone(&zone, reader, keyCount);
+        enum ZONES_ERR zoneResult = readZone(&zone, reader, keyCount);
 
-        if (result == ZONES_OK)
-            result = addZone(zone);
+        if (zoneResult == ZONES_OK)
+            zoneResult = addZone(zone);
 
-        if (result != ZONES_OK)
+        if (zoneResult != ZONES_OK)
         {
             freeCsvReader(reader);
 
             if (zone.name != NULL)
                 free((char *)zone.name);
 
-            return result;
+            return zoneResult;
         }
     }
 
@@ -205,7 +206,7 @@ TZone **getAllZones(size_t *dim)
     int i = 0;
     while (current != NULL)
     {
-        *arrayZone[i++] = current->zone;
+        arrayZone[i++] = &(current->zone);
         current = current->next;
     }
 
