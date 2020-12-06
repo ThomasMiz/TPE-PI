@@ -3,14 +3,14 @@
 #include "specieTrieADT.h"
 
 /* When the population of a zone isn't present, this value will be asigned. */
-#define NUMBER_NOT_PRESENT -1
+#define NUMBER_NOT_PRESENT 0
 
 /* Represents a zone. For example, a neighborhood. */
 typedef struct
 {
     const char *name;
     unsigned int population;
-    size_t treeCount;
+    unsigned int treeCount;
     specieTrieADT species;
 } TZone;
 

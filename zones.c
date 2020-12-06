@@ -1,9 +1,9 @@
-#include "csvReaderADT.h"
-#include "memhelper.h"
-#include "zones.h"
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include "csvReaderADT.h"
+#include "memhelper.h"
+#include "zones.h"
 
 // The identifier in the csv header for the column that contains a zone's name.
 #define COL_ZONENAME 1
