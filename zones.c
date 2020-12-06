@@ -4,6 +4,7 @@
 #include "csvReaderADT.h"
 #include "memhelper.h"
 #include "zones.h"
+#include "defines.h"
 
 typedef struct node
 {

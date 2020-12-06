@@ -5,6 +5,7 @@
 #include "specieCounterADT.h"
 #include "zones.h"
 #include "trees.h"
+#include "defines.h"
 
 static enum TREES_ERR readTree(csvReaderADT reader, int keyCount, char *buffSpecie)
 {
