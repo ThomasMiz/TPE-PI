@@ -137,7 +137,7 @@ static void readTokenToBuff(csvReaderADT reader)
         }
     }
 
-    reader->buff[reader->buff_count] = '\0';
+    reader->buff[reader->buff_count++] = '\0';
 
     // If the char we read is a '\n', we ungetc-it, so that no line is advanced until csvNextLine () is called.
     if (c == '\n')
@@ -204,7 +204,7 @@ const char *csvNextToken(csvReaderADT reader, size_t *strLen, int *numCol)
     reader->currentColumn++;
 
     *numCol = nextColumn;
-    *strLen = reader->buff_count;
+    *strLen = reader->buff_count - 1;
     return reader->buff;
 }
 

@@ -17,16 +17,12 @@
 
 int main(int argc, char *argv[])
 {
-    printf("%d\n",argc);
-    for(int i=0; i<argc; i++){
-        printf("%d: %s\n",i,argv[i]);
-    }
-
     if (argc > ARG_EXP)
     {
         printf("Too many arguments supplied.\n");
         return ARG_ERR;
     }
+
     if (argc < ARG_EXP)
     {
         printf("Not enough arguments supplied.\n");
@@ -82,7 +78,7 @@ int main(int argc, char *argv[])
 
     enum QUERY1_ERR query1Result = saveQuery1();
 
-    if(query1Result != QUERY1_OK)
+    if (query1Result != QUERY1_OK)
     {
         switch (query1Result)
         {
@@ -103,7 +99,7 @@ int main(int argc, char *argv[])
 
     enum QUERY2_ERR query2Result = saveQuery2();
 
-    if(query2Result != QUERY2_OK)
+    if (query2Result != QUERY2_OK)
     {
         switch (query2Result)
         {

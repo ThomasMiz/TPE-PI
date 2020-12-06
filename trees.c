@@ -9,7 +9,7 @@
 static enum TREES_ERR readTree(csvReaderADT reader, int keyCount, char *buffSpecie)
 {
     const char *tokenStr;
-    size_t len;
+    size_t len, specieLen = 0;
     int tokenCol;
 
     TZone *zone = NULL;
@@ -31,6 +31,7 @@ static enum TREES_ERR readTree(csvReaderADT reader, int keyCount, char *buffSpec
             // If at any time a file interprets unknown species as an empty string remains buffSpecie[0]='\0'.
             // We only need to save the name of the species because
             // we don't know if it appears before the name of the zone.
+            specieLen = len;
             if (len != 0)
                 strcpy(buffSpecie, tokenStr);
             break;
@@ -44,7 +45,7 @@ static enum TREES_ERR readTree(csvReaderADT reader, int keyCount, char *buffSpec
     if (zone != NULL)
     {
         zone->treeCount++;
-        enum SPECIE_ERR specieResult = specieAddOne(zone->species, buffSpecie, len);
+        enum SPECIE_ERR specieResult = specieAddOne(zone->species, buffSpecie, specieLen);
         if (specieResult == SPECIE_NO_MEMORY)
             return TREES_NO_MEMORY;
     }

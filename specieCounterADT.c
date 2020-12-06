@@ -11,7 +11,7 @@
 typedef struct listNode
 {
     char *name;
-    unsigned int count;
+    unsigned long count;
     struct listNode *next;
 } TNode;
 
@@ -52,7 +52,7 @@ enum SPECIE_ERR specieAddOne(specieCounterADT species, const char *specieName, s
         return SPECIE_BAD_NAME;
 
     int c;
-    if (species->list == NULL || (c = strcasecmp(specieName, species->list->name) < 0))
+    if (species->list == NULL || (c = strcasecmp(specieName, species->list->name)) < 0)
     {
         TNode *newNode;
         if (!tryMalloc((void **)&newNode, sizeof(TNode)))
@@ -66,6 +66,7 @@ enum SPECIE_ERR specieAddOne(specieCounterADT species, const char *specieName, s
             return SPECIE_NO_MEMORY;
         }
         strcpy(newNode->name, specieName);
+        return SPECIE_OK;
     }
 
     if (c == 0)
