@@ -34,6 +34,9 @@ TZone *getZoneByName(const char *name);
 
 /* Executes the provided function for each loaded zone, in alphabetical order.
 ** if returns 1 continues and if not, it cuts the execution */
-void zonesForEach(int (*func)(const TZone*));
+void zonesForEach(int (*func)(TZone*));
+
+/*returns an array with all zones and NULL if there are no zones or if it ran out of memory*/
+TZone ** getAllZones(size_t *dim);
 
 #endif

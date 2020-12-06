@@ -18,6 +18,7 @@ typedef struct node
 typedef TNode *TList;
 
 static TList zones = NULL;
+static size_t zoneCount = 0;
 
 static enum ZONES_ERR addZone(TZone newZone)
 {
@@ -36,6 +37,7 @@ static enum ZONES_ERR addZone(TZone newZone)
     {
         newNode->next = zones;
         zones = newNode;
+        zoneCount++;
         return ZONES_OK;
     }
 
@@ -57,6 +59,7 @@ static enum ZONES_ERR addZone(TZone newZone)
 
     newNode->next = currentZone;
     previousZone->next = newNode;
+    zoneCount++;
 
     return ZONES_OK;
 }
@@ -173,9 +176,8 @@ TZone *getZoneByName(const char *name)
     return (current != NULL && c == 0) ? &(current->zone) : NULL;
 }
 
-void zonesForEach(int (*func)(const TZone *))
+void zonesForEach(int (*func)(TZone *))
 {
-
     TList current = zones;
     while (current != NULL)
     {
@@ -185,4 +187,25 @@ void zonesForEach(int (*func)(const TZone *))
         else
             return;
     }
+}
+
+TZone ** getAllZones(size_t * dim){
+
+    if(zones == NULL)
+        return NULL;
+
+    TZone ** arrayZone;
+    if(!tryMalloc((void**)&arrayZone, sizeof(TZone*)*zoneCount)){
+        return NULL;
+    }
+
+    TList current = zones;
+    int i = 0;
+    while(current != NULL){
+        *arrayZone[i++] = current->zone;
+        current = current->next;
+    }
+
+    *dim = i;
+    return arrayZone;
 }
