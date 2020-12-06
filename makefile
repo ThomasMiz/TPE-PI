@@ -13,4 +13,4 @@ datasetVAN:
 	$(COMPILER) -o $(OUTPUT_FILE_VAN) $(FILES) $(FLAGS) -D VAN
 
 clean:
-	rm -r $(OUTPUT_FILE_BUE) $(OUTPUT_FILE_VAN) *.o
+	rm -r *.out
