@@ -114,11 +114,14 @@ enum ZONES_ERR initializeZones(const char *file)
 
     int columns[] = {COL_ZONENAME, COL_POPULATION};
     int keyCount = sizeof(columns) / sizeof(columns[0]);
-    int statusHeader = csvSetupHeader(reader, columns, keyCount);
+    int headerResult = csvSetupHeader(reader, columns, keyCount);
 
-    if (statusHeader < 0)
+    if (headerResult < 0)
     {
         freeCsvReader(reader);
+        if(headerResult == CSV_NO_MEMORY)
+            return ZONES_NO_MEMORY;
+        
         return ZONES_MISSING_COLUMN;
     }
 
@@ -126,16 +129,17 @@ enum ZONES_ERR initializeZones(const char *file)
     while (csvNextLine(reader))
     {
         enum ZONES_ERR result = readZone(&zone, reader, keyCount);
-        
-        if(result == ZONES_OK)
+
+        if (result == ZONES_OK)
             result = addZone(zone);
-        
-        if(result != ZONES_OK) {
+
+        if (result != ZONES_OK)
+        {
             freeCsvReader(reader);
 
-            if(zone.name != NULL)
+            if (zone.name != NULL)
                 free((char *)zone.name);
-            
+
             return result;
         }
     }
@@ -148,7 +152,8 @@ void freeZones()
 {
     TList current = zones;
 
-    while(current != NULL) {
+    while (current != NULL)
+    {
 
         TList next = current->next;
         free((char *)current->zone.name);
@@ -157,26 +162,27 @@ void freeZones()
     }
 }
 
-TZone *getZoneByName(const char *name) {
-
-    if(zones == NULL)
-        return NULL;
-
+TZone *getZoneByName(const char *name)
+{
     int c;
     TList current = zones;
-    TZone *copyZone = NULL;
-    while(current != NULL){
-        
-        if((c = strcasecmp(name, current->zone.name)) < 0)
+
+    while (current != NULL && (c = strcasecmp(name, current->zone.name) > 0))
+        current = current->next;
+
+    return (current != NULL && c == 0) ? &(current->zone) : NULL;
+}
+
+void zonesForEach(int (*func)(const TZone *))
+{
+
+    TList current = zones;
+    while (current != NULL)
+    {
+
+        if (func(&(current->zone)))
             current = current->next;
-        
-        else if (c == 0){
-            copyZone = malloc(sizeof(TZone));
-            *copyZone = current->zone;
-            return copyZone;
-        }else 
-            return NULL;
+        else
+            return;
     }
-    
-    return copyZone;
 }
