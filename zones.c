@@ -23,7 +23,6 @@ static size_t zoneCount = 0;
 
 static enum ZONES_ERR addZone(TZone newZone)
 {
-
     // We created a new node at the beginning of the function since the existence of two or more neighborhoods
     // with the same name in the file is a uncommon error and is not considered for this optimization.
     TList newNode;

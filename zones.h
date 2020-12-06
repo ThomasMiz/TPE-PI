@@ -9,8 +9,8 @@
 typedef struct
 {
     const char *name;
-    unsigned int population;
-    unsigned int treeCount;
+    unsigned long population;
+    unsigned long treeCount;
     specieCounterADT species;
 } TZone;
 
