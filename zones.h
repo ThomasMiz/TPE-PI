@@ -1,6 +1,6 @@
 #ifndef zones_h
 #define zones_h
-#include "specieTrieADT.h"
+#include "specieCounterADT.h"
 
 /* When the population of a zone isn't present, this value will be asigned. */
 #define NUMBER_NOT_PRESENT 0
@@ -11,7 +11,7 @@ typedef struct
     const char *name;
     unsigned int population;
     unsigned int treeCount;
-    specieTrieADT species;
+    specieCounterADT species;
 } TZone;
 
 enum ZONES_ERR

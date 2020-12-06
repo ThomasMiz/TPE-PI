@@ -2,7 +2,7 @@
 #include <string.h>
 #include "memhelper.h"
 #include "csvReaderADT.h"
-#include "specieTrieADT.h"
+#include "specieCounterADT.h"
 #include "zones.h"
 #include "trees.h"
 
@@ -45,7 +45,7 @@ static enum TREES_ERR readTree(csvReaderADT reader, int keyCount, char *buffSpec
     if (zone != NULL)
     {
         zone->treeCount++;
-        enum SPECIE_ERR specieResult = specieAddOne(zone->species, buffSpecie);
+        enum SPECIE_ERR specieResult = specieAddOne(zone->species, buffSpecie, len);
         if (specieResult == SPECIE_NO_MEMORY)
             return TREES_NO_MEMORY;
     }
@@ -55,14 +55,14 @@ static enum TREES_ERR readTree(csvReaderADT reader, int keyCount, char *buffSpec
 
 static int setupSpecies(TZone *zone)
 {
-    zone->species = newSpecieTrie();
+    zone->species = newSpecieCounter();
     zone->treeCount = 0;
     return 1;
 }
 
 static int unwrapSpecies(TZone *zone)
 {
-    freeSpecieTrie(zone->species);
+    freeSpecieCounter(zone->species);
     return 1;
 }
 
@@ -97,7 +97,7 @@ enum TREES_ERR processTrees(const char *file)
     while (csvNextLine(reader))
     {
         enum TREES_ERR treeResult = readTree(reader, keyCount, buffSpecie);
-        
+
         // If there is an error reading a tree, the process ends without reading
         // the trees that follow, is a contract matter.
         if (treeResult != TREES_OK)
