@@ -1,5 +1,6 @@
 #ifndef csvReaderADT_h
 #define csvReaderADT_h
+#include <stddef.h>
 
 /* CSV Reader ADT: for ease of reading CSV files. */
 
