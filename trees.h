@@ -1,6 +1,7 @@
 #ifndef trees_h
 #define trees_h
 
+/* Defines errors that can be thrown by operations from trees processing. */
 enum TREES_ERR
 {
     TREES_OK = 0,

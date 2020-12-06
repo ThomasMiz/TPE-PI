@@ -144,7 +144,7 @@ static void readTokenToBuff(csvReaderADT reader)
         ungetc('\n', file);
 }
 
-int csvSetupHeader(csvReaderADT reader, int columns[], size_t dim)
+enum CSV_ERR csvSetupHeader(csvReaderADT reader, int columns[], size_t dim)
 {
     // Defensive programming in case the header is read more than once.
     if (reader->requiredColumns != NULL)
@@ -165,9 +165,9 @@ int csvSetupHeader(csvReaderADT reader, int columns[], size_t dim)
         numberOfColums++;
     }
 
-    // If a column that does not exist is needed, returns error.
+    // If a column that does not exist is needed, returns CSV_MISSING_COLUMN.
     if (numberOfColums < columns[dim - 1])
-        return CSV_MAX_COLUMNS_ERROR;
+        return CSV_MISSING_COLUMN;
 
     //The column of interest's numbers are saved in the structure.
     for (reader->columnsCount = 0; reader->columnsCount < dim; reader->columnsCount++)
@@ -176,7 +176,7 @@ int csvSetupHeader(csvReaderADT reader, int columns[], size_t dim)
     // The requiredColumns array needs to be sorted, so let's sorted.
     sortArray(reader->requiredColumns, reader->columnsCount);
 
-    return numberOfColums;
+    return CSV_OK;
 }
 
 const char *csvNextToken(csvReaderADT reader, size_t *strLen, int *numCol)

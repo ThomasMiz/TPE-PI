@@ -21,9 +21,10 @@ typedef TNode *TList;
 static TList zones = NULL;
 static size_t zoneCount = 0;
 
+// Adds a zone to the structure if no error has encountered.
 static enum ZONES_ERR addZone(TZone newZone)
 {
-    // We created a new node at the beginning of the function since the existence of two or more neighborhoods
+    // We created a new node at the beginning of the function since the existence of two or more zones
     // with the same name in the file is a uncommon error and is not considered for this optimization.
     TList newNode;
     if (!tryMalloc((void **)&newNode, sizeof(TNode)))
@@ -44,7 +45,7 @@ static enum ZONES_ERR addZone(TZone newZone)
     TList previousZone = zones;
     TList currentZone = zones->next;
 
-    // We move through the list until it ends, finds a repeating neighborhood or needs to add a neighborhood.
+    // We move through the list until it ends, finds a repeating zone or needs to add a zone.
     while (currentZone != NULL && (c = strcasecmp(newZone.name, currentZone->zone.name)) > 0)
     {
         previousZone = currentZone;
@@ -64,6 +65,7 @@ static enum ZONES_ERR addZone(TZone newZone)
     return ZONES_OK;
 }
 
+// Reads a zone to the structure if no error has encountered.
 static enum ZONES_ERR readZone(TZone *zone, csvReaderADT reader, int keyCount)
 {
     zone->name = NULL;
@@ -73,11 +75,12 @@ static enum ZONES_ERR readZone(TZone *zone, csvReaderADT reader, int keyCount)
     size_t len;
     int tokenCol;
 
-    // We read the tokens from the current line and save them on "current".
+    // We read the tokens from the current line and save them on tokenStr.
     for (int i = 0; i < keyCount; i++)
     {
         tokenStr = csvNextToken(reader, &len, &tokenCol);
 
+        // In case new columns are added they would be added as new cases.
         switch (tokenCol)
         {
         case COL_ZONENAME:
@@ -106,7 +109,7 @@ static enum ZONES_ERR readZone(TZone *zone, csvReaderADT reader, int keyCount)
 
 enum ZONES_ERR initializeZones(const char *file)
 {
-    // Zones should only be initialized once.
+    // Zones should only be initialized once, unique static structure.
     if (zones != NULL)
         return ZONES_ALREADY_INITIALIZED;
 
@@ -115,11 +118,12 @@ enum ZONES_ERR initializeZones(const char *file)
     if (reader == NULL)
         return ZONES_NO_FILE;
 
+    // Columns of interest in the file, if more needed they would be added to the vector.
     int columns[] = {COL_ZONENAME, COL_POPULATION};
     int keyCount = sizeof(columns) / sizeof(columns[0]);
-    int headerResult = csvSetupHeader(reader, columns, keyCount);
+    enum CSV_ERR headerResult = csvSetupHeader(reader, columns, keyCount);
 
-    if (headerResult < 0)
+    if (headerResult != CSV_OK)
     {
         freeCsvReader(reader);
         if (headerResult == CSV_NO_MEMORY)
@@ -129,6 +133,8 @@ enum ZONES_ERR initializeZones(const char *file)
     }
 
     TZone zone;
+
+    // We read zones data.
     while (csvNextLine(reader))
     {
         enum ZONES_ERR zoneResult = readZone(&zone, reader, keyCount);

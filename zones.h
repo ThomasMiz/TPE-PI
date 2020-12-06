@@ -14,6 +14,7 @@ typedef struct
     specieCounterADT species;
 } TZone;
 
+/* Defines errors that can be thrown by operations from zones processing. */
 enum ZONES_ERR
 {
     ZONES_OK = 0,

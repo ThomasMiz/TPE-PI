@@ -12,13 +12,19 @@
 
 typedef struct csvReaderCDT *csvReaderADT;
 
-// The maximum capacity allowed for a buffer. Any token longer than this amount of chars will be trimmed to this amount.
-// This will be the length of the string, Including '\0'.
+/* The maximum capacity allowed for a buffer. Any token longer than this amount of chars will be trimmed to this amount.
+** This will be the length of the string, Including '\0'. */
 #define MAX_BUFF_CAPACITY 129
 
-#define CSV_ALREADY_INITIALIZED -1
-#define CSV_NO_MEMORY -2
-#define CSV_MAX_COLUMNS_ERROR -3
+
+enum CSV_ERR
+{
+    CSV_OK = 0,
+    CSV_ALREADY_INITIALIZED,
+    CSV_NO_FILE,
+    CSV_MISSING_COLUMN,
+    CSV_NO_MEMORY,
+};
 
 /* Create a new csvReaderADT and initialize it to read the provided file. 
 ** If the file could not be opened, it does not create a reader and returns NULL. */
@@ -33,8 +39,8 @@ int csvEndOfFile(csvReaderADT);
 /* To use in the first line, the header.
 ** Save the column of interest's numbers in the structure from the vector colums.
 ** If there are not enough columns, it will return CSV_MAX_COLUMNS_ERROR.
-** Returns the number of columns in the header, or if there was an error it will return CSV_ALREADY_INITIALIZED or CSV_NO_MEMORY. */
-int csvSetupHeader(csvReaderADT, int columns[], size_t dim);
+** Returns CSV_OK if no problem has encountered, or if there was an error it will return CSV_ALREADY_INITIALIZED or CSV_NO_MEMORY. */
+enum CSV_ERR csvSetupHeader(csvReaderADT, int columns[], size_t dim);
 
 /* Read the next token and return a string with the content and leave its length in strLen.
 ** The returned pointer MUST NOT BE SAVED, it points to an internal buffer and it will be modified

@@ -21,7 +21,8 @@ static enum TREES_ERR readTree(csvReaderADT reader, int keyCount, char *buffSpec
     for (int i = 0; i < keyCount; i++)
     {
         tokenStr = csvNextToken(reader, &len, &tokenCol);
-
+        
+        // In case new columns are added they would be added as new cases.
         switch (tokenCol)
         {
         case COL_ZONENAME:
@@ -30,11 +31,11 @@ static enum TREES_ERR readTree(csvReaderADT reader, int keyCount, char *buffSpec
             break;
 
         case COL_SPECIENAME:
-            // If at any time a file interprets unknown species as an empty string.
+            // If at any time a file interprets unknown species as an empty string remains buffSpecie[0]='\0'.
+            // We only need to save the name of the species because
+            // we don't know if it appears before the name of the zone.
             if (len != 0)
                 strcpy(buffSpecie, tokenStr);
-            // We only need to save the name of the species because
-            // we don't know if it appears before the name of the neighborhood.
             break;
 
         default:
@@ -42,6 +43,7 @@ static enum TREES_ERR readTree(csvReaderADT reader, int keyCount, char *buffSpec
         }
     }
 
+    // If the zone exists then we add a new tree and add a new species if it didn't exist before.
     if (zone != NULL)
     {
         zone->treeCount++;
@@ -53,12 +55,16 @@ static enum TREES_ERR readTree(csvReaderADT reader, int keyCount, char *buffSpec
     return TREES_OK;
 }
 
+// Static functions to add the speciesCounterADT in each zone.
+
 static int setupSpecies(TZone *zone)
 {
     zone->species = newSpecieCounter();
     zone->treeCount = 0;
     return 1;
 }
+
+// Static functions to free the speciesCounterADT in each zone.
 
 static int unwrapSpecies(TZone *zone)
 {
@@ -73,11 +79,12 @@ enum TREES_ERR processTrees(const char *file)
     if (reader == NULL)
         return TREES_NO_FILE;
 
+    // Columns of interest in the file, if more needed they would be added to the vector.
     int columns[] = {COL_ZONENAME, COL_SPECIENAME};
     int keyCount = sizeof(columns) / sizeof(columns[0]);
-    int headerResult = csvSetupHeader(reader, columns, keyCount);
+    enum CSV_ERR headerResult = csvSetupHeader(reader, columns, keyCount);
 
-    if (headerResult < 0)
+    if (headerResult != CSV_OK)
     {
         freeCsvReader(reader);
         if (headerResult == CSV_NO_MEMORY)
@@ -85,6 +92,7 @@ enum TREES_ERR processTrees(const char *file)
         return TREES_MISSING_COLUMN;
     }
 
+    // Buffer to save species names in case they appear before the zone.
     char *buffSpecie;
     if (!tryMalloc((void **)&buffSpecie, MAX_BUFF_CAPACITY))
     {
@@ -94,6 +102,7 @@ enum TREES_ERR processTrees(const char *file)
 
     zonesForEach(setupSpecies);
 
+    // We read trees data.
     while (csvNextLine(reader))
     {
         enum TREES_ERR treeResult = readTree(reader, keyCount, buffSpecie);
